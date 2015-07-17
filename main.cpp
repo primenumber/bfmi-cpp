@@ -1,54 +1,42 @@
 #include <iostream>
 #include <string>
 
-#include "bfm_memory.hpp"
+#include "state.hpp"
 
 namespace bfm {
 
-struct state {
-  memory mem;
-  int64_t prog_index;
-  int64_t data_index;
-  state(const std::string &prog)
-    : mem(prog), prog_index(0), data_index(0) {}
-};
-
 bool step(state &st) {
   unsigned char c;
-  switch(st.mem.get(st.prog_index)) {
+  switch(st.get_prog()) {
    case '+':
-    st.mem.inc(st.data_index);
+    st.inc_val();
     break;
    case '-':
-    st.mem.dec(st.data_index);
+    st.dec_val();
     break;
    case '>':
-    ++st.data_index;
+    st.inc_ptr();
     break;
    case '<':
-    --st.data_index;
+    st.dec_ptr();
     break;
    case '[':
-    if (st.mem.get(st.data_index) == 0) {
-      st.prog_index = st.mem.find_match(st.prog_index);
-    }
+    st.loop_in();
     break;
    case ']':
-    if (st.mem.get(st.data_index) != 0) {
-      st.prog_index = st.mem.find_match(st.prog_index);
-    }
+    st.loop_out();
     break;
    case '.':
-    std::cout << st.mem.get(st.data_index);
+    std::cout << st.get_val();
     break;
    case ',':
     std::cin >> c;
-    st.mem.set(st.data_index, c);
+    st.set_val(c);
     break;
    case '\0':
     return false;
   }
-  ++st.prog_index;
+  st.inc_prog_ptr();
   return true;
 }
 
