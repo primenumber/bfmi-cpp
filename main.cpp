@@ -14,12 +14,13 @@ struct state {
 };
 
 bool step(state &st) {
-  switch(st.mem[st.prog_index]) {
+  unsigned char c;
+  switch(st.mem.get(st.prog_index)) {
    case '+':
-    ++st.mem[st.data_index];
+    st.mem.inc(st.data_index);
     break;
    case '-':
-    --st.mem[st.data_index];
+    st.mem.dec(st.data_index);
     break;
    case '>':
     ++st.data_index;
@@ -28,20 +29,21 @@ bool step(state &st) {
     --st.data_index;
     break;
    case '[':
-    if (st.mem[st.data_index] == 0) {
+    if (st.mem.get(st.data_index) == 0) {
       st.prog_index = st.mem.find_match(st.prog_index);
     }
     break;
    case ']':
-    if (st.mem[st.data_index] != 0) {
+    if (st.mem.get(st.data_index) != 0) {
       st.prog_index = st.mem.find_match(st.prog_index);
     }
     break;
    case '.':
-    std::cout << st.mem[st.data_index];
+    std::cout << st.mem.get(st.data_index);
     break;
    case ',':
-    std::cin >> st.mem[st.data_index];
+    std::cin >> c;
+    st.mem.set(st.data_index, c);
     break;
    case '\0':
     return false;
